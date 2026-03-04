@@ -1,0 +1,2540 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BodyTech Gym - Get Fit. Stay Strong.</title>
+    <!-- Font Awesome for icons (social media, hamburger) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        :root {
+            --primary-blue: #007bff; /* A nice blue */
+            --light-blue: #e0f2ff; /* Very light blue */
+            --dark-blue: #0056b3; /* Darker blue for hover */
+            --white: #ffffff;
+            --black: #000000;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-color);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            overflow-x: hidden; /* Prevent horizontal scroll due to animations */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--black);
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--dark-blue);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 25px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--dark-blue);
+            transform: translateY(-2px);
+            color: var(--white); /* Ensure text remains white */
+        }
+
+        /* --- Welcome Splash Screen --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
+        #splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        #splash-screen h1 {
+            color: var(--white);
+            font-size: 3rem;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            from { transform: scale(0.95); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+
+        /* --- Privacy Policy Modal --- */
+        #privacy-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998; /* Below splash screen, above everything else */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        #privacy-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #privacy-modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        #privacy-modal-overlay.show #privacy-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        #privacy-modal-content h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #privacy-policy-text {
+            max-height: 400px; /* Make policy text scrollable */
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px; /* For scrollbar space */
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+        #privacy-policy-text p {
+            margin-bottom: 15px;
+        }
+        .privacy-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .privacy-buttons .btn {
+            flex: 1;
+            max-width: 150px;
+        }
+
+
+        /* Header */
+        header {
+            background-color: var(--white);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: block; /* Always show hamburger for consistency with overlay */
+            width: 30px;
+            height: 25px;
+            position: relative;
+            cursor: pointer;
+            z-index: 1001;
+            margin-left: auto; /* Push to right */
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-blue);
+            border-radius: 2px;
+            position: absolute;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger span:nth-child(1) { top: 0; }
+        .hamburger span:nth-child(2) { top: 11px; }
+        .hamburger span:nth-child(3) { top: 22px; }
+
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg); top: 11px; }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg); top: 11px; }
+
+
+        /* Mobile Navigation Overlay (now half screen from right) */
+        .mobile-nav-overlay {
+            position: fixed;
+            top: 0;
+            right: 0; /* Align to right */
+            width: 50vw; /* Half screen width */
+            max-width: 400px; /* Limit on larger screens */
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--light-blue)); /* Blue/White gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateX(100%); /* Start off-screen to the right */
+            transition: transform 0.4s ease-in-out;
+            z-index: 999;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2); /* Shadow on left edge */
+        }
+
+        .mobile-nav-overlay.open {
+            transform: translateX(0); /* Slide in */
+        }
+
+        .mobile-nav-overlay ul {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+            width: 100%; /* Take full width of overlay */
+        }
+
+        .mobile-nav-overlay ul li {
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 15px;
+        }
+        .mobile-nav-overlay ul li:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-nav-overlay ul li a {
+            color: var(--black); /* Black words */
+            font-size: 1.5rem; /* Slightly smaller for half screen */
+            font-weight: bold;
+            display: block;
+            padding: 10px;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            white-space: nowrap; /* Prevent wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Add ellipsis if text is too long */
+        }
+
+        .mobile-nav-overlay ul li a:hover {
+            color: var(--primary-blue);
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        .mobile-nav-overlay ul li a.active {
+            color: var(--white); /* Active link text white in blue overlay */
+            background-color: var(--dark-blue); /* Darker blue for active background */
+            border-radius: 5px;
+        }
+
+
+        /* Fixed Contact Buttons */
+        .fixed-contact-buttons {
+            position: fixed;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .fixed-contact-buttons a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: var(--white);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .fixed-contact-buttons a:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .fixed-contact-buttons .whatsapp { background-color: #25D366; }
+        .fixed-contact-buttons .call { background-color: var(--primary-blue); }
+
+        /* Live Notifications */
+        #live-notifications {
+            position: fixed;
+            bottom: 20px;
+            left: 20px; /* Align to left */
+            background-color: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            padding: 10px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            z-index: 800;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            transform: translateY(100px); /* Start below screen */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: calc(100% - 100px); /* Prevent overlapping with call buttons */
+        }
+        #live-notifications.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0); /* Slide up */
+        }
+        .notification-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-blue);
+            flex-shrink: 0; /* Prevent avatar from shrinking */
+        }
+        .notification-text {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.85rem;
+            line-height: 1.2;
+            white-space: normal; /* Allow wrapping */
+        }
+        .notification-text b {
+            color: var(--primary-blue);
+        }
+        .notification-text small {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+
+        /* Main Content Area */
+        #main-content {
+            min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+            padding-top: 20px; /* Space for sticky header */
+        }
+
+        .page-section {
+            display: none; /* Hide all pages by default, JS will show one */
+            padding: 40px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        .page-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        /* 1. Home Page */
+        #home-page {
+            display: block; /* Default visible page */
+            padding: 0;
+        }
+
+        .hero-section {
+            position: relative;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .hero-bg-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1.5s ease-in-out;
+            opacity: 0;
+            z-index: 1;
+        }
+        .hero-bg-slider.active {
+            opacity: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            /* REMOVED: background-color: rgba(0, 0, 0, 0.5); */ /* Semi-transparent overlay for text readability */
+            border-radius: 10px;
+            max-width: 800px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: var(--white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: var(--white);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .quick-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 20px;
+            background-color: var(--light-blue);
+            padding: 30px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px; /* Minimum width for each stat */
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+        
+        /* Home Page - Why Choose Us section */
+        .why-choose-us {
+            margin-top: 50px;
+            padding: 40px 0;
+            background-color: var(--white);
+        }
+        .why-choose-us h2 {
+            color: var(--primary-blue);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .feature-item {
+            text-align: center;
+            padding: 25px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .feature-item i {
+            font-size: 3.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+        .feature-item h3 {
+            font-size: 1.4rem;
+            color: var(--black);
+            margin-bottom: 10px;
+        }
+        .feature-item p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+
+
+        /* 2. About Us */
+        #about-page h2 { color: var(--primary-blue); }
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: center;
+        }
+        .about-text, .about-images {
+            flex: 1;
+            min-width: 300px;
+        }
+        .about-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        .about-images img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 3. Membership Packages */
+        #membership-page h2 { color: var(--primary-blue); }
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .package-card {
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .package-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .package-card h3 {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .package-card .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--black);
+            margin-bottom: 20px;
+        }
+
+        .package-card .price span {
+            font-size: 1rem;
+            font-weight: normal;
+            color: var(--text-color);
+        }
+
+        .package-card ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .package-card ul li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .package-card ul li i {
+            margin-right: 8px;
+            color: #28a745; /* Green checkmark */
+        }
+        .package-card ul li.unavailable i {
+             color: #dc3545; /* Red cross */
+        }
+        .package-card ul li.unavailable {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        /* Membership FAQ */
+        .membership-faq {
+            margin-top: 50px;
+        }
+        .membership-faq h3 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 30px;
+        }
+        .faq-item {
+            background-color: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 15px 20px;
+            background-color: var(--light-gray);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: var(--black);
+            transition: background-color 0.3s ease;
+        }
+        .faq-question:hover {
+            background-color: #e9ecef;
+        }
+        .faq-question i {
+            transition: transform 0.3s ease;
+        }
+        .faq-question.active i {
+            transform: rotate(180deg);
+        }
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            color: var(--text-color);
+        }
+        .faq-answer.show {
+            max-height: 200px; /* Adjust based on expected content height */
+            padding: 15px 20px;
+        }
+
+
+        /* 4. Our Trainers (Doctor-like design) */
+        #trainers-page h2 { color: var(--primary-blue); text-align: center;}
+        
+        .trainer-profile-row {
+            display: flex;
+            flex-direction: row; /* Default for desktop */
+            align-items: center;
+            gap: 30px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .trainer-profile-row:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .trainer-img-container {
+            flex-shrink: 0; /* Don't shrink image container */
+            width: 200px; /* Fixed width for desktop image */
+            height: 200px; /* Fixed height */
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid var(--primary-blue);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .trainer-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .trainer-info {
+            flex-grow: 1; /* Allow info to take remaining space */
+        }
+
+        .trainer-name {
+            font-size: 2rem;
+            color: var(--black);
+            margin-bottom: 5px;
+        }
+
+        .trainer-credentials {
+            font-size: 1.1rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .trainer-specialty {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .trainer-experience {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .trainer-experience i {
+            margin-right: 8px;
+            color: #28a745; /* Green for award icon */
+        }
+
+        .trainer-bio {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+        
+        /* 5. Transformations */
+        #transformations-page h2 { color: var(--primary-blue); }
+        .transformation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .transformation-card {
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .transformation-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .transformation-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .transformation-card .story {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .transformation-card .story h4 {
+            color: var(--black);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .transformation-card .story p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+
+        /* 6. Gallery */
+        #gallery-page h2 { color: var(--primary-blue); }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 7. Reviews */
+        #reviews-page h2 { color: var(--primary-blue); }
+        .reviews-section {
+            background-color: var(--light-blue);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .reviews-section .rating {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .reviews-section .stars {
+            color: #ffc107; /* Gold color for stars */
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .testimonial-card {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            position: relative;
+        }
+        .testimonial-card i.fa-quote-left {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            padding-left: 30px; /* Space for quote icon */
+        }
+
+        .testimonial-card .client-name {
+            font-weight: bold;
+            color: var(--black);
+            text-align: right;
+            display: block;
+        }
+
+        /* 8. Classes Schedule */
+        #classes-page h2 { color: var(--primary-blue); text-align: center;}
+        .schedule-table-container {
+            margin-top: 30px;
+            overflow-x: auto; /* Make table scrollable on small screens */
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px; /* Ensure table is wide enough for content */
+        }
+        .schedule-table th, .schedule-table td {
+            border: 1px solid var(--light-gray);
+            padding: 12px;
+            text-align: center;
+        }
+        .schedule-table th {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .schedule-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .schedule-table td {
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        .schedule-table td strong {
+            color: var(--dark-blue);
+        }
+        .class-description {
+            font-size: 0.85rem;
+            color: #555;
+            display: block;
+            margin-top: 5px;
+        }
+
+
+        /* 9. Contact */
+        #contact-page h2 { color: var(--primary-blue); }
+        .contact-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .contact-info, .contact-map {
+            flex: 1;
+            min-width: 300px;
+        }
+        .contact-info p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .contact-info p i {
+            margin-right: 10px;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+        }
+        .contact-map iframe {
+            width: 100%;
+            height: 300px;
+            border: 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 10. Video Hub (Provided Code Integration) */
+        #video-hub-page {
+            background-color: #0f0f0f; /* Dark theme as in original */
+            color: #fff;
+            padding-top: 0; /* No extra padding for this page */
+            border-bottom: none;
+        }
+        #video-hub-page h2 { color: var(--white); } /* Adjust h2 for dark theme */
+        
+        /* --- HERO SECTION (BADA PLAYER) --- */
+        #video-hub-page .hero-section { /* Specificity for this page */
+            width: 100%;
+            height: 75vh; /* 75% of screen height */
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 3px solid #ff0000; /* Red bottom border */
+        }
+
+        #video-hub-page .hero-section video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Video ko crop hone se bachata hai */
+            outline: none;
+        }
+
+        /* --- PLAYLIST SECTION (NICHE WALI VIDEOS) --- */
+        .playlist-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .playlist-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff;
+            border-left: 4px solid #ff0000;
+            padding-left: 10px;
+        }
+
+        .video-list {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto; /* Scrollable if screen is small */
+            padding-bottom: 115px;
+        }
+
+        /* Scrollbar design */
+        .video-list::-webkit-scrollbar {
+            height: 8px;
+        }
+        .video-list::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        /* Choti Video Cards */
+        .video-card {
+            min-width: 220px;
+            background-color: #222;
+            border-radius: 8px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s, border 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            border-color: #555;
+        }
+
+        .video-card.active {
+            border-color: #ff0000; /* Red border for active video */
+            background-color: #333;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 120px;
+            background-color: #000;
+            pointer-events: none; /* Taki sirf card par click ho */
+        }
+
+        .thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 10px;
+        }
+
+        .video-info h4 {
+            font-size: 1rem;
+            font-weight: normal;
+            color: #eee;
+        }
+
+        /* 11. Booking Page */
+        #booking-page h2 { color: var(--primary-blue); }
+        .booking-form {
+            background-color: var(--light-gray);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 30px auto 0;
+        }
+
+        .booking-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .booking-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .booking-form input[type="text"],
+        .booking-form input[type="email"],
+        .booking-form input[type="tel"],
+        .booking-form input[type="datetime-local"],
+        .booking-form select,
+        .booking-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: var(--text-color);
+            background-color: var(--white);
+        }
+
+        .booking-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .booking-form .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-blue);
+            color: var(--white);
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .social-icons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .social-icons a {
+            color: var(--white);
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-blue);
+            transform: translateY(-5px) scale(1.1);
+            color: var(--white);
+        }
+        .developer-info {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .developer-info a {
+            color: var(--light-blue);
+            font-weight: bold;
+        }
+        .developer-info a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .mobile-nav-overlay {
+                width: 70vw; /* Larger on smaller mobiles */
+                max-width: none; /* Remove max-width on mobile */
+            }
+            .mobile-nav-overlay ul li a {
+                font-size: 1.3rem; /* Adjust font size for smaller screens */
+            }
+            .mobile-nav-overlay ul li {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+
+            #privacy-modal-content {
+                width: 95%; /* Adjust width for very small screens */
+                padding: 20px;
+            }
+            #privacy-modal-content h2 {
+                font-size: 1.5rem;
+            }
+            #privacy-policy-text {
+                max-height: 300px;
+                font-size: 0.85rem;
+            }
+            .privacy-buttons .btn {
+                max-width: none; /* Allow buttons to take full width of container */
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+
+            .quick-stats {
+                flex-direction: column;
+            }
+            .stat-item {
+                margin-bottom: 20px;
+            }
+
+            .about-text, .about-images, .contact-info, .contact-map {
+                min-width: unset;
+                flex-basis: 100%;
+            }
+
+            .package-grid, .features-grid, .transformation-grid, .gallery-grid, .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Trainer profile for mobile */
+            .trainer-profile-row {
+                flex-direction: column; /* Stack image and info vertically */
+                text-align: center;
+            }
+            .trainer-img-container {
+                width: 150px; /* Smaller image on mobile */
+                height: 150px;
+                margin: 0 auto 20px auto; /* Center image */
+            }
+            .trainer-name {
+                font-size: 1.6rem;
+            }
+            .trainer-credentials {
+                font-size: 1rem;
+            }
+            .trainer-experience {
+                justify-content: center; /* Center icon and text */
+            }
+
+            .fixed-contact-buttons {
+                right: 10px;
+                top: auto;
+                bottom: 10px;
+                flex-direction: row;
+                transform: none;
+                width: auto; /* Let content determine width */
+                justify-content: flex-end; /* Align to right on mobile */
+                gap: 10px;
+            }
+            .fixed-contact-buttons a {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+
+            #live-notifications {
+                left: 10px; /* Adjust for padding on small screens */
+                bottom: 80px; /* Above fixed contact buttons */
+                max-width: calc(100% - 20px); /* Fill remaining width */
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            .notification-avatar {
+                width: 30px;
+                height: 30px;
+            }
+            .notification-text span {
+                font-size: 0.8rem;
+            }
+            .notification-text small {
+                font-size: 0.7rem;
+            }
+
+
+            #video-hub-page .hero-section {
+                height: 50vh; /* Shorter hero video on mobile */
+            }
+            .video-list {
+                padding-bottom: 0; /* No extra padding on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Splash Screen -->
+    <div id="splash-screen">
+        <h1>Welcome to BodyTech Multan!</h1>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal-overlay">
+        <div id="privacy-modal-content">
+            <h2>Privacy Policy for BodyTech Gym</h2>
+            <div id="privacy-policy-text">
+                <p><strong>1. Introduction</strong></p>
+                <p>Welcome to BodyTech Gym Multan. We are committed to protecting your privacy and handling your personal data in a transparent manner. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our services, or interact with us.</p>
+
+                <p><strong>2. Information We Collect</strong></p>
+                <p>We may collect personal information that you voluntarily provide to us when you register for services, make a booking, fill out forms, or contact us. This may include:</p>
+                <ul>
+                    <li><strong>Personal Identifiers:</strong> Name, address, email address, phone number, date of birth.</li>
+                    <li><strong>Payment Information:</strong> Credit/debit card details (processed securely by third-party payment processors, we do not store full card details).</li>
+                    <li><strong>Health Information:</strong> Fitness goals, health history (only as necessary for personalized training and safety, provided voluntarily).</li>
+                    <li><strong>Usage Data:</strong> Information about how you access and use our website, including your IP address, browser type, pages viewed, and referral sources.</li>
+                </ul>
+
+                <p><strong>3. How We Use Your Information</strong></p>
+                <p>We use the information we collect for various purposes, including:</p>
+                <ul>
+                    <li>To provide and manage our services, including memberships, personal training, and group classes.</li>
+                    <li>To process your bookings and payments.</li>
+                    <li>To communicate with you about your account, services, and promotional offers.</li>
+                    <li>To personalize your fitness experience and offer tailored advice.</li>
+                    <li>To improve our website, services, and customer support.</li>
+                    <li>For internal record keeping, legal compliance, and fraud prevention.</li>
+                </ul>
+
+                <p><strong>4. Disclosure of Your Information</strong></p>
+                <p>We do not sell, trade, or rent your personal identification information to others. We may share generic aggregated demographic information not linked to any personal identification information regarding visitors and users with our business partners, trusted affiliates, and advertisers for the purposes outlined above.</p>
+                <p>We may use third-party service providers to help us operate our business and the Site or administer activities on our behalf, such as sending out newsletters or surveys. We may share your information with these third parties for those limited purposes provided that you have given us your permission.</p>
+
+                <p><strong>5. Data Security</strong></p>
+                <p>We adopt appropriate data collection, storage, and processing practices and security measures to protect against unauthorized access, alteration, disclosure, or destruction of your personal information, username, password, transaction information, and data stored on our Site.</p>
+
+                <p><strong>6. Your Rights</strong></p>
+                <p>You have the right to:</p>
+                <ul>
+                    <li>Access the personal data we hold about you.</li>
+                    <li>Request correction of inaccurate or incomplete data.</li>
+                    <li>Request deletion of your personal data, subject to certain legal obligations.</li>
+                    <li>Object to the processing of your data in certain circumstances.</li>
+                </ul>
+                <p>To exercise any of these rights, please contact us using the details below.</p>
+
+                <p><strong>7. Changes to This Privacy Policy</strong></p>
+                <p>BodyTech Gym Multan has the discretion to update this privacy policy at any time. When we do, we will revise the updated date at the bottom of this page. We encourage Users to frequently check this page for any changes to stay informed about how we are helping to protect the personal information we collect.</p>
+
+                <p><strong>8. Contacting Us</strong></p>
+                <p>If you have any questions about this Privacy Policy, the practices of this site, or your dealings with this site, please contact us at:</p>
+                <p>BodyTech Gym Multan<br>
+                Gulgasht, Multan, Pakistan<br>
+                Phone: +92 318 4195665 | +92 318 8791637<br>
+                Email: info@bodytechgym.com (placeholder)</p>
+                <p><em>This document was last updated on March 04, 2026.</em></p>
+            </div>
+            <div class="privacy-buttons">
+                <button class="btn" onclick="acceptPrivacy()">Accept</button>
+                <button class="btn" onclick="closePrivacyModal()">Not Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Contact Buttons -->
+    <div class="fixed-contact-buttons">
+        <a href="https://wa.me/923188791637" target="_blank" class="whatsapp" title="WhatsApp Us">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="tel:+923184195665" class="call" title="Call Us">
+            <i class="fas fa-phone"></i>
+        </a>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">BodyTech Multan</div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay (Half screen from right) -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay">
+        <ul>
+            <li><a href="#home-page" onclick="showPage('home-page');">🏠 HOME</a></li>
+            <li><a href="#about-page" onclick="showPage('about-page');">💪 ABOUT US</a></li>
+            <li><a href="#membership-page" onclick="showPage('membership-page');">📋 MEMBERSHIP PACKAGES</a></li>
+            <li><a href="#trainers-page" onclick="showPage('trainers-page');">👨‍💼 OUR TRAINERS</a></li>
+            <li><a href="#transformations-page" onclick="showPage('transformations-page');">🏆 TRANSFORMATIONS</a></li>
+            <li><a href="#gallery-page" onclick="showPage('gallery-page');">📸 GALLERY</a></li>
+            <li><a href="#reviews-page" onclick="showPage('reviews-page');">⭐ REVIEWS</a></li>
+            <li><a href="#classes-page" onclick="showPage('classes-page');">🗓️ CLASSES SCHEDULE</a></li> <!-- NEW PAGE LINK -->
+            <li><a href="#video-hub-page" onclick="showPage('video-hub-page');">📺 VIDEO HUB</a></li>
+            <li><a href="#booking-page" onclick="showPage('booking-page');">📝 BOOKING</a></li>
+            <li><a href="#contact-page" onclick="showPage('contact-page');">📞 CONTACT</a></li>
+        </ul>
+    </div>
+
+    <!-- Live Notifications -->
+    <div id="live-notifications">
+        <!-- Content will be injected by JavaScript -->
+    </div>
+
+    <!-- Main Content Area (All Pages will be loaded here) -->
+    <main id="main-content">
+
+        <!-- 1. HOME PAGE -->
+        <section id="home-page" class="page-section">
+            <div class="hero-section">
+                <div class="hero-bg-slider active" style="background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+                <div class="hero-bg-slider" style="background-image: url('https://plus.unsplash.com/premium_photo-1661265933107-85a5dbd815af?q=80&w=1118&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+                <div class="hero-bg-slider" style="background-image: url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+                <div class="hero-bg-slider" style="background-image: url('https://images.unsplash.com/photo-1577221084712-45b0445d2b00?q=80&w=698&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+                <div class="hero-bg-slider" style="background-image: url('https://plus.unsplash.com/premium_photo-1733328015522-c497d190f74b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+                <div class="hero-content">
+                    <h1>Get Fit. Stay Strong.</h1>
+                    <p>Unlock Your Full Potential at BodyTech Multan</p>
+                    <a href="https://wa.me/923188791637" target="_blank" class="btn"><i class="fab fa-whatsapp"></i> Join Now via WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="container quick-stats">
+                <div class="stat-item">
+                    <h3>2000+</h3>
+                    <p>Happy Members</p>
+                </div>
+                <div class="stat-item">
+                    <h3>15+</h3>
+                    <p>Expert Trainers</p>
+                </div>
+                <div class="stat-item">
+                    <h3>10+</h3>
+                    <p>Years of Excellence</p>
+                </div>
+                <div class="stat-item">
+                    <h3>50+</h3>
+                    <p>Classes Per Week</p>
+                </div>
+            </div>
+
+            <div class="container why-choose-us">
+                <h2>Why Choose BodyTech Gym?</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-dumbbell"></i>
+                        <h3>Modern Equipment</h3>
+                        <p>Access to the latest and most effective gym machinery for all your workout needs.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Expert Trainers</h3>
+                        <p>Certified professionals dedicated to guiding you through personalized fitness journeys.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-users"></i>
+                        <h3>Supportive Community</h3>
+                        <p>Join a family of fitness enthusiasts who motivate and uplift each other.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>Flexible Plans</h3>
+                        <p>Choose from a variety of membership packages tailored to fit your lifestyle and budget.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-leaf"></i>
+                        <h3>Holistic Wellness</h3>
+                        <p>Beyond workouts, we offer nutritional advice and wellness programs for overall health.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Safe & Clean Environment</h3>
+                        <p>Your health and safety are our priority with regularly sanitized facilities.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container text-center" style="margin-top: 50px;">
+                <h2>Ready to Start Your Journey?</h2>
+                <p>Take the first step towards a healthier, stronger you today.</p>
+                <a href="#booking-page" onclick="showPage('booking-page')" class="btn btn-large">Book a Free Trial!</a>
+            </div>
+        </section>
+
+        <!-- 2. ABOUT US -->
+        <section id="about-page" class="page-section container">
+            <h2>💪 About BodyTech Gym</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Welcome to BodyTech Gym, a premier fitness destination located in the heart of Gulgasht, Multan. Our journey began over a decade ago with a simple mission: to create a community where everyone feels empowered to achieve their fitness goals, regardless of their starting point.</p>
+                    <p><strong>Our Mission:</strong> To inspire, educate, and empower individuals to lead healthier, stronger lives through personalized training, state-of-the-art facilities, and a supportive environment.</p>
+                    <p><strong>Our Vision:</strong> To be the leading fitness and wellness hub in Multan, known for our innovative training methodologies, exceptional client results, and a positive, inclusive atmosphere.</p>
+                    <p>At BodyTech, we believe fitness is a lifestyle, not just a routine. We offer a holistic approach to health, focusing on physical strength, mental well-being, and nutritional guidance. Join our family and experience the BodyTech difference!</p>
+                    
+                    <h3>Our Core Values</h3>
+                    <ul>
+                        <li><strong>Excellence:</strong> We strive for the highest standards in training, equipment, and customer service.</li>
+                        <li><strong>Community:</strong> We foster a welcoming and inclusive environment where everyone feels supported.</li>
+                        <li><strong>Integrity:</strong> We operate with honesty and transparency in all our dealings.</li>
+                        <li><strong>Innovation:</strong> We continuously seek new and effective ways to help our members achieve their goals.</li>
+                        <li><strong>Passion:</strong> We are passionate about fitness and dedicated to sharing that passion with you.</li>
+                    </ul>
+                </div>
+                <div class="about-images">
+                    <img src="https://images.unsplash.com/photo-1547849495-9273f08efcf9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gym Interior 1">
+                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gym Interior 2">
+                    <img src="https://images.unsplash.com/photo-1550005807-b5d1471d6464?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gym Equipment">
+                    <img src="https://images.unsplash.com/photo-1563817112444-24e6ca160b73?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Training Session">
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. MEMBERSHIP PACKAGES -->
+        <section id="membership-page" class="page-section container">
+            <h2>📋 Our Membership Packages</h2>
+            <p class="text-center">Choose the plan that fits your fitness journey best!</p>
+
+            <div class="package-grid">
+                <!-- Monthly Package -->
+                <div class="package-card">
+                    <div>
+                        <h3>Monthly Plan</h3>
+                        <p class="price">PKR 3,000<span>/month</span></p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Access to all gym equipment</li>
+                            <li><i class="fas fa-check-circle"></i> Standard Group Classes</li>
+                            <li><i class="fas fa-check-circle"></i> Basic Fitness Assessment</li>
+                            <li class="unavailable"><i class="fas fa-times-circle"></i> Personalized Training</li>
+                            <li class="unavailable"><i class="fas fa-times-circle"></i> Nutritional Guidance</li>
+                            <li class="unavailable"><i class="fas fa-times-circle"></i> Priority Booking</li>
+                        </ul>
+                    </div>
+                    <a href="#booking-page" onclick="showPage('booking-page')" class="btn">Join Now</a>
+                </div>
+
+                <!-- 3-Month Package -->
+                <div class="package-card">
+                    <div>
+                        <h3>3-Month Plan</h3>
+                        <p class="price">PKR 8,000<span>/3 months</span></p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Access to all gym equipment</li>
+                            <li><i class="fas fa-check-circle"></i> Advanced Group Classes</li>
+                            <li><i class="fas fa-check-circle"></i> Comprehensive Fitness Assessment</li>
+                            <li><i class="fas fa-check-circle"></i> 2 Personal Training Sessions</li>
+                            <li class="unavailable"><i class="fas fa-times-circle"></i> Nutritional Guidance</li>
+                            <li class="unavailable"><i class="fas fa-times-circle"></i> Priority Booking</li>
+                        </ul>
+                    </div>
+                    <a href="#booking-page" onclick="showPage('booking-page')" class="btn">Join Now</a>
+                </div>
+
+                <!-- 6-Month Package (Recommended) -->
+                <div class="package-card">
+                    <div>
+                        <h3>6-Month Plan</h3>
+                        <p class="price">PKR 15,000<span>/6 months</span></p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Full Gym Access + Priority</li>
+                            <li><i class="fas fa-check-circle"></i> All Group Classes (incl. Premium)</li>
+                            <li><i class="fas fa-check-circle"></i> Advanced Fitness Assessment</li>
+                            <li><i class="fas fa-check-circle"></i> 5 Personal Training Sessions</li>
+                            <li><i class="fas fa-check-circle"></i> Basic Nutritional Guidance</li>
+                            <li><i class="fas fa-check-circle"></i> Priority Class Booking</li>
+                        </ul>
+                    </div>
+                    <a href="#booking-page" onclick="showPage('booking-page')" class="btn">Join Now</a>
+                </div>
+
+                <!-- Yearly Package (Best Value) -->
+                <div class="package-card">
+                    <div>
+                        <h3>Yearly Plan</h3>
+                        <p class="price">PKR 25,000<span>/year</span></p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Unlimited Gym Access</li>
+                            <li><i class="fas fa-check-circle"></i> All Group Classes (Unlimited)</li>
+                            <li><i class="fas fa-check-circle"></i> Advanced Fitness Assessment + Re-assessment</li>
+                            <li><i class="fas fa-check-circle"></i> 10 Personal Training Sessions</li>
+                            <li><i class="fas fa-check-circle"></i> Comprehensive Nutritional Guidance</li>
+                            <li><i class="fas fa-check-circle"></i> VIP Event Access</li>
+                        </ul>
+                    </div>
+                    <a href="#booking-page" onclick="showPage('booking-page')" class="btn">Join Now</a>
+                </div>
+            </div>
+
+            <div class="membership-faq">
+                <h3>Frequently Asked Questions About Memberships</h3>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I try the gym before committing to a membership?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer a complimentary free trial session for all new visitors. You can book it through our booking page!</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What payment methods do you accept?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept cash payments, bank transfers, and most major credit/debit cards. Our front desk staff can provide more details.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I upgrade or downgrade my membership?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, you can upgrade your membership at any time. Downgrades are typically permitted at the end of your current billing cycle. Please speak with our membership team.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Are personal training sessions included in all packages?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Personal training sessions are included in our 3-Month, 6-Month, and Yearly plans. The Monthly Plan includes access to group classes only. Additional PT sessions can be purchased separately.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. OUR TRAINERS -->
+        <section id="trainers-page" class="page-section container">
+            <h2>👨‍💼 Meet Our Expert Trainers</h2>
+            <p class="text-center">Our certified trainers are here to guide you to success.</p>
+
+            <!-- Trainer 1 -->
+            <div class="trainer-profile-row">
+                <div class="trainer-img-container">
+                    <img src="https://plus.unsplash.com/premium_photo-1663134078572-1a66ed48f0c2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8ODl8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Trainer Ahmed Khan" class="trainer-img" loading="lazy">
+                </div>
+                <div class="trainer-info">
+                    <h3 class="trainer-name">Ahmed Khan</h3>
+                    <div class="trainer-credentials">Certified Strength & Conditioning Specialist</div>
+                    <div class="trainer-specialty">Weight Loss, Bodybuilding & Muscle Gain</div>
+                    <div class="trainer-experience">
+                        <i class="fas fa-award"></i>10+ Years Experience
+                    </div>
+                    <p class="trainer-bio">
+                        Ahmed is a seasoned trainer with a passion for transforming bodies and lives. His expertise lies in crafting personalized workout routines and nutrition plans that deliver exceptional results in weight loss and muscle development. He's known for his motivating style and ability to push clients to their full potential.
+                    </p>
+                    <a href="https://wa.me/923188791637" target="_blank" class="btn">Contact Ahmed</a>
+                </div>
+            </div>
+
+            <!-- Trainer 2 -->
+            <div class="trainer-profile-row">
+                <div class="trainer-img-container">
+                    <img src="https://plus.unsplash.com/premium_photo-1664475053226-ae61318afabf?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Trainer Sara Ali" class="trainer-img" loading="lazy">
+                </div>
+                <div class="trainer-info">
+                    <h3 class="trainer-name">Sara Ali</h3>
+                    <div class="trainer-credentials">Certified Personal Trainer (CPT), Yoga Instructor</div>
+                    <div class="trainer-specialty">Functional Fitness, Yoga & Pilates</div>
+                    <div class="trainer-experience">
+                        <i class="fas fa-award"></i>7+ Years Experience
+                    </div>
+                    <p class="trainer-bio">
+                        Sara brings a holistic approach to fitness, combining strength training with mind-body practices like yoga and Pilates. She specializes in improving flexibility, core strength, and overall functional movement, helping clients achieve balance and reduce injury risk. Her sessions are invigorating and tailored to individual needs.
+                    </p>
+                    <a href="https://wa.me/923188791637" target="_blank" class="btn">Contact Sara</a>
+                </div>
+            </div>
+
+            <!-- Trainer 3 -->
+            <div class="trainer-profile-row">
+                <div class="trainer-img-container">
+                    <img src="https://plus.unsplash.com/premium_photo-1661963174428-93d9a3024aa4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTN8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Trainer Imran Khan" class="trainer-img" loading="lazy">
+                </div>
+                <div class="trainer-info">
+                    <h3 class="trainer-name">Imran Khan</h3>
+                    <div class="trainer-credentials">Sports Nutritionist, Fitness Coach</div>
+                    <div class="trainer-specialty">Performance Enhancement, Sports-Specific Training</div>
+                    <div class="trainer-experience">
+                        <i class="fas fa-award"></i>12+ Years Experience
+                    </div>
+                    <p class="trainer-bio">
+                        Imran is dedicated to helping athletes and fitness enthusiasts optimize their performance. With a strong background in sports science and nutrition, he designs programs that enhance endurance, speed, and power, coupled with strategic meal plans for peak physical condition.
+                    </p>
+                    <a href="https://wa.me/923188791637" target="_blank" class="btn">Contact Imran</a>
+                </div>
+            </div>
+
+            <!-- Trainer 4 (Added) -->
+            <div class="trainer-profile-row">
+                <div class="trainer-img-container">
+                    <img src="https://plus.unsplash.com/premium_photo-1667509282630-a632969c3fde?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjI4fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Trainer Aisha Malik" class="trainer-img" loading="lazy">
+                </div>
+                <div class="trainer-info">
+                    <h3 class="trainer-name">Aisha Malik</h3>
+                    <div class="trainer-credentials">Certified Group Fitness Instructor, Zumba Specialist</div>
+                    <div class="trainer-specialty">High-Energy Group Classes, Dance Fitness</div>
+                    <div class="trainer-experience">
+                        <i class="fas fa-award"></i>8+ Years Experience
+                    </div>
+                    <p class="trainer-bio">
+                        Aisha brings contagious energy to every class. Specializing in high-intensity interval training (HIIT) and various dance fitness formats like Zumba, she makes working out fun and effective. Her goal is to ensure every participant leaves feeling empowered and energized.
+                    </p>
+                    <a href="https://wa.me/923188791637" target="_blank" class="btn">Contact Aisha</a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 5. TRANSFORMATIONS -->
+        <section id="transformations-page" class="page-section container">
+            <h2>🏆 Real Transformations, Real Stories</h2>
+            <p class="text-center">See the incredible journeys of our dedicated members.</p>
+
+            <div class="transformation-grid">
+                <div class="transformation-card">
+                    <img src="https://images.unsplash.com/photo-1646495003511-5906221732be?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA2fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Before/After 1">
+                    <div class="story">
+                        <h4>Ahmad's 25kg Weight Loss</h4>
+                        <p>"BodyTech changed my life! The trainers, diet plan, and environment helped me lose 25kg in 6 months. I feel healthier and more confident than ever."</p>
+                    </div>
+                </div>
+                <div class="transformation-card">
+                    <img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA5fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Before/After 2">
+                    <div class="story">
+                        <h4>Sana's Strength Journey</h4>
+                        <p>"I came to BodyTech with no prior gym experience. Now, I can lift more than I ever imagined! Thanks to my trainer for pushing me beyond my limits."</p>
+                    </div>
+                </div>
+                <div class="transformation-card">
+                    <img src="https://plus.unsplash.com/premium_photo-1667509221263-3d5f8b8b0a58?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTM2fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Before/After 3">
+                    <div class="story">
+                        <h4>Alia's Fitness Comeback</h4>
+                        <p>"After a long break, BodyTech was the perfect place to get back on track. The modern equipment and supportive community made my comeback enjoyable and successful."</p>
+                    </div>
+                </div>
+                <!-- Added Transformation 4 -->
+                <div class="transformation-card">
+                    <img src="https://images.unsplash.com/photo-1658848507056-24ba67502b1d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjI5fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Before/After 4">
+                    <div class="story">
+                        <h4>Bilal's Endurance Challenge</h4>
+                        <p>"I never thought I could run a marathon, but with BodyTech's endurance program and coach Imran, I not only finished but felt great doing it!"</p>
+                    </div>
+                </div>
+                <!-- Added Transformation 5 -->
+                <div class="transformation-card">
+                    <img src="https://plus.unsplash.com/premium_photo-1661964033046-60c54ef7e2bd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjUyfHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Before/After 5">
+                    <div class="story">
+                        <h4>Zara's Post-Pregnancy Fitness</h4>
+                        <p>"BodyTech provided the perfect supportive environment to regain my strength and fitness after pregnancy. The flexible classes were a lifesaver."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. GALLERY -->
+        <section id="gallery-page" class="page-section container">
+            <h2>📸 Our Gym Gallery</h2>
+            <p class="text-center">A glimpse into our state-of-the-art facilities and vibrant training environment.</p>
+
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1637666218229-1fe0a9419267?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTE2fHxneW18ZW58MHx8MHx8fDA%3D" alt="Gym Equipment 1"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z3ltfGVufDB8fDB8fHww" alt="Training Session 1"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z3ltJTIwZXF1aXBtZW50fGVufDB8fDB8fHww" alt="Gym Environment 1"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1637666062717-1c6bcfa4a4df?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Weightlifting Area"></div>
+                <div class="gallery-item"><img src="https://media.istockphoto.com/id/80488814/photo/treadmills-in-a-row.webp?a=1&b=1&s=612x612&w=0&k=20&c=ItgcfS-28pJ3xtdoJh7B8Jq-LgRYeT_URJZnwCLEQk4=" alt="Cardio Machines"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzR8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Group Class"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Free Weights"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1637666123723-1bea229bd054?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTB8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Training Session 2"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1570829460005-c840387bb1ca?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTJ8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Modern Equipment"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1685633224597-294ff1adfd6f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjB8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Workout Area"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1623874514711-0f321325f318?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Njh8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Stretch Area"></div>
+                <div class="gallery-item"><img src="https://plus.unsplash.com/premium_photo-1664298832416-3016045d2fd7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nzd8fGd5bSUyMGVxdWlwbWVudHxlbnwwfHwwfHx8MA%3D%3D" alt="Dumbbells"></div>
+                <!-- Added more gallery items -->
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1728486144466-2a9f151dfbaf?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjUxfHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Gym Interior Shot"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTE4fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Training area"></div>
+                <div class="gallery-item"><img src="https://plus.unsplash.com/premium_photo-1663099395431-5ce696a55420?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjY0fHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Workout class in progress"></div>
+                <div class="gallery-item"><img src="https://images.unsplash.com/photo-1767552273968-da3464e2986c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjcxfHxneW0lMjBlcXVpcG1lbnR8ZW58MHx8MHx8fDA%3D" alt="Gym weights"></div>
+            </div>
+        </section>
+
+        <!-- 7. REVIEWS -->
+        <section id="reviews-page" class="page-section container">
+            <h2>⭐ What Our Members Say</h2>
+            <div class="reviews-section">
+                <p class="rating">4.9 / 5.0</p>
+                <div class="stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
+                <p>Based on 500+ Google Reviews</p>
+            </div>
+
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"Best gym in Multan! The equipment is top-notch, and the trainers are incredibly supportive. I've seen amazing results."</p>
+                    <span class="client-name">- Junaid H.</span>
+                </div>
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"A very friendly and welcoming environment. I felt comfortable from day one. Highly recommend BodyTech for all fitness levels."</p>
+                    <span class="client-name">- Zara S.</span>
+                </div>
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"The classes are fantastic and the personalized attention from trainers is what makes the difference. Truly a great investment in health."</p>
+                    <span class="client-name">- Imran K.</span>
+                </div>
+                <!-- Added Testimonial 4 -->
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"I love the variety of classes offered. There's always something new to try, and the instructors make every session challenging and fun!"</p>
+                    <span class="client-name">- Amina R.</span>
+                </div>
+                <!-- Added Testimonial 5 -->
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"The cleanliness and overall ambiance of BodyTech are unmatched. It's a pleasure to work out here every day."</p>
+                    <span class="client-name">- Fahad B.</span>
+                </div>
+                <!-- Added Testimonial 6 -->
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"After struggling with my weight for years, BodyTech gave me the tools and motivation I needed. I'm finally seeing real progress!"</p>
+                    <span class="client-name">- Saima W.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. CLASSES SCHEDULE (NEW PAGE) -->
+        <section id="classes-page" class="page-section container">
+            <h2>🗓️ Our Group Classes Schedule</h2>
+            <p class="text-center">Join our diverse range of classes designed for all fitness levels!</p>
+
+            <div class="schedule-table-container">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>6:00 AM - 7:00 AM</strong></td>
+                            <td><strong>HIIT Cardio</strong><span class="class-description">High-Intensity Interval Training</span></td>
+                            <td><strong>Yoga Flow</strong><span class="class-description">Flexibility & Core Strength</span></td>
+                            <td><strong>BodyPump</strong><span class="class-description">Full Body Weight Training</span></td>
+                            <td><strong>Zumba Dance</strong><span class="class-description">Fun & Energetic Cardio</span></td>
+                            <td><strong>Spin Class</strong><span class="class-description">Indoor Cycling Workout</span></td>
+                            <td><strong>Bootcamp</strong><span class="class-description">Outdoor Group Workout</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>9:00 AM - 10:00 AM</strong></td>
+                            <td><strong>Pilates</strong><span class="class-description">Core Stability & Control</span></td>
+                            <td><strong>Power Yoga</strong><span class="class-description">Strength & Balance</span></td>
+                            <td><strong>Aqua Aerobics</strong><span class="class-description">Low-Impact Water Workout</span></td>
+                            <td><strong>BodyCombat</strong><span class="class-description">Martial Arts Inspired Cardio</span></td>
+                            <td><strong>Stretch & Relax</strong><span class="class-description">Deep Stretching Session</span></td>
+                            <td><strong>Functional Training</strong><span class="class-description">Real-world Movement</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>5:00 PM - 6:00 PM</strong></td>
+                            <td><strong>Zumba Dance</strong><span class="class-description">Fun & Energetic Cardio</span></td>
+                            <td><strong>HIIT Cardio</strong><span class="class-description">High-Intensity Interval Training</span></td>
+                            <td><strong>Spin Class</strong><span class="class-description">Indoor Cycling Workout</span></td>
+                            <td><strong>BodyPump</strong><span class="class-description">Full Body Weight Training</span></td>
+                            <td><strong>Yoga Flow</strong><span class="class-description">Flexibility & Core Strength</span></td>
+                            <td><strong>Core & Abs</strong><span class="class-description">Targeted Core Workout</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>7:00 PM - 8:00 PM</strong></td>
+                            <td><strong>BodyCombat</strong><span class="class-description">Martial Arts Inspired Cardio</span></td>
+                            <td><strong>Bootcamp</strong><span class="class-description">Outdoor Group Workout</span></td>
+                            <td><strong>Power Yoga</strong><span class="class-description">Strength & Balance</span></td>
+                            <td><strong>Pilates</strong><span class="class-description">Core Stability & Control</span></td>
+                            <td><strong>HIIT Cardio</strong><span class="class-description">High-Intensity Interval Training</span></td>
+                            <td><strong>Full Body Stretch</strong><span class="class-description">Relaxation & Recovery</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-center" style="margin-top: 30px;">Classes are subject to change. Please check with the front desk for the most up-to-date schedule and instructor information.</p>
+        </section>
+
+        <!-- 9. CONTACT -->
+        <section id="contact-page" class="page-section container">
+            <h2>📞 Contact Us</h2>
+            <div class="contact-details">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Gulgasht, Multan, Pakistan</p>
+                    <p><i class="fas fa-phone-alt"></i> <a href="tel:+923184195665">+92 318 4195665</a></p>
+                    <p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/923188791637" target="_blank">WhatsApp Us</a></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:info@bodytechgym.com">info@bodytechgym.com</a></p>
+                    <p><i class="fas fa-clock"></i> Mon-Sat: 6:00 AM - 11:00 PM</p>
+                    <p><i class="fas fa-clock"></i> Sun: 8:00 AM - 5:00 PM</p>
+
+                    <h3 style="margin-top: 30px;">Send us a quick message!</h3>
+                    <form id="contactQuickForm" class="booking-form" style="padding: 20px; box-shadow: none;">
+                        <div class="form-group">
+                            <label for="contactName">Your Name:</label>
+                            <input type="text" id="contactName" name="contactName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">Your Email:</label>
+                            <input type="email" id="contactEmail" name="contactEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactMessage">Message:</label>
+                            <textarea id="contactMessage" name="contactMessage" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Send Message</button>
+                    </form>
+                </div>
+                <div class="contact-map">
+                    <h3>Our Location</h3>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3403.490799602526!2d71.46465491494488!3d30.29290138177579!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3922cbe2347101e3%3A0xc3f124c6e9196b65!2sGulgasht%2C%20Multan%2C%20Punjab%2C%20Pakistan!5e0!3m2!1sen!2sus!4v1678912345678!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. VIDEO HUB -->
+        <section id="video-hub-page" class="page-section">
+            <!-- BADA HERO VIDEO PLAYER -->
+            <div class="hero-section">
+                <video id="mainPlayer" controls autoplay muted>
+                    <!-- Default Video (Video 1) -->
+                    <source id="mainSource" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- NICHE WALI 6 VIDEOS KI LIST -->
+            <div class="playlist-container">
+                <h2 class="playlist-title">Up Next (Training & Motivational Videos)</h2>
+                
+                <div class="video-list">
+                    
+                    <!-- Video 1 -->
+                    <div class="video-card active" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>1. Big Buck Bunny (Warmup)</h4>
+                        </div>
+                    </div>
+
+                    <!-- Video 2 -->
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>2. Elephants Dream (Motivation)</h4>
+                        </div>
+                    </div>
+
+                    <!-- Video 3 -->
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>3. Sintel Movie (Focus)</h4>
+                        </div>
+                    </div>
+
+                    <!-- Video 4 -->
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>4. Tears of Steel (Endurance)</h4>
+                        </div>
+                    </div>
+
+                    <!-- Video 5 -->
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>5. For Bigger Blazes (Cardio)</h4>
+                        </div>
+                    </div>
+
+                    <!-- Video 6 -->
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>6. For Bigger Escapes (Strength)</h4>
+                        </div>
+                    </div>
+                    <!-- Added more sample videos -->
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>7. For Bigger Fun (Workout Mix)</h4>
+                        </div>
+                    </div>
+                    <div class="video-card" onclick="playVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', this)">
+                        <div class="thumbnail">
+                        <video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" muted preload="metadata"></video>
+                        </div>
+                        <div class="video-info">
+                        <h4>8. For Bigger Joyrides (Dance Fitness)</h4>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. BOOKING PAGE -->
+        <section id="booking-page" class="page-section container">
+            <h2>📝 Book Your Session / Free Trial</h2>
+            <p class="text-center">Fill out the form below and we'll get back to you to confirm your booking.</p>
+
+            <form class="booking-form" id="bookingForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="service">Interested In:</label>
+                    <select id="service" name="service" required>
+                        <option value="">-- Select Service --</option>
+                        <option value="Free Trial">Free Trial</option>
+                        <option value="Personal Training">Personal Training</option>
+                        <option value="Group Classes">Group Classes</option>
+                        <option value="Membership Enquiry">Membership Enquiry</option>
+                        <option value="Gym Tour">Gym Tour</option>
+                        <option value="Nutritional Consultation">Nutritional Consultation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="preferredDate">Preferred Date & Time:</label>
+                    <input type="datetime-local" id="preferredDate" name="preferredDate">
+                </div>
+                <div class="form-group">
+                    <label for="message">Your Message / Special Requests:</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn">Submit Booking Request</button>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 BodyTech Gym Multan. All rights reserved.</p>
+            <div class="social-icons">
+                <a href="https://facebook.com/yourgym" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://instagram.com/yourgym" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com/yourgym" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://youtube.com/yourgym" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+            <p class="developer-info">Developed by <a href="https://wa.me/923188791637" target="_blank">Sky Eagle</a></p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- Splash Screen Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            const splashDuration = 3500; // 3.5 seconds visible
+            const fadeDuration = 1000;  // 1 second fade out
+
+            setTimeout(() => {
+                splashScreen.classList.add('fade-out');
+                splashScreen.addEventListener('transitionend', () => {
+                    splashScreen.remove();
+                    // Start privacy modal timer AFTER splash screen is fully gone
+                    startPrivacyModalTimer();
+                }, { once: true }); // Ensure this listener runs only once
+            }, splashDuration);
+
+            // Initial page load for home
+            showPage('home-page');
+            
+            // Start notifications initially (will be controlled by showPage now)
+            // No need for a separate DOMContentLoaded listener here for notifications.
+        });
+
+        // --- Privacy Policy Modal Logic ---
+        const privacyModalOverlay = document.getElementById('privacy-modal-overlay');
+
+        function startPrivacyModalTimer() {
+            // Check localStorage if privacy policy has already been accepted
+            if (localStorage.getItem('privacyAccepted') !== 'true') {
+                setTimeout(() => {
+                    openPrivacyModal();
+                }, 60000); // 1 minute after splash screen is gone
+            }
+        }
+
+        function openPrivacyModal() {
+            privacyModalOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling while modal is open
+        }
+
+        function closePrivacyModal() {
+            privacyModalOverlay.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        function acceptPrivacy() {
+            localStorage.setItem('privacyAccepted', 'true'); // Store user's acceptance
+            closePrivacyModal();
+        }
+
+        // --- Page Navigation Logic (SPA) ---
+        const pageSections = document.querySelectorAll('.page-section');
+        const mobileNavLinks = document.querySelectorAll('#mobileNavOverlay a');
+        let currentPageId = 'home-page'; // Default page
+        let notificationInterval = null; // Initialize to null
+
+        function showPage(pageId) {
+            // Pause main video if leaving video-hub-page
+            if (currentPageId === 'video-hub-page') {
+                const mainPlayer = document.getElementById('mainPlayer');
+                if (mainPlayer) {
+                    mainPlayer.pause();
+                }
+            }
+            
+            // Handle Live Notifications Visibility
+            const notificationElement = document.getElementById('live-notifications');
+            if (pageId === 'video-hub-page' || pageId === 'classes-page') { // Also hide on classes page for cleaner look
+                notificationElement.classList.remove('show');
+                if (notificationInterval) { // Only clear if it's actually running
+                    clearInterval(notificationInterval);
+                    notificationInterval = null; // Reset to null so it can be re-initialized
+                }
+            } else {
+                // Only start/show if it's not already running or was cleared
+                if (notificationInterval === null) {
+                     // Initial show (or re-start after being cleared)
+                    setTimeout(() => {
+                        showNotification();
+                        notificationInterval = setInterval(showNotification, 6000); // Show new notification every 6 seconds
+                    }, 2000); // Start after 2 seconds
+                } else {
+                    // If it's already running (not null), just ensure it's visible.
+                    notificationElement.classList.add('show');
+                }
+            }
+
+
+            pageSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                currentPageId = pageId; // Update current page
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+            }
+
+            // Update active state in mobile nav
+            mobileNavLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${pageId}`) {
+                    link.classList.add('active');
+                }
+            });
+            closeMobileNav(); // Close nav after selection
+        }
+
+        // --- Hamburger Menu Logic ---
+        const hamburger = document.getElementById('hamburger');
+        const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            mobileNavOverlay.classList.toggle('open');
+        });
+
+        function closeMobileNav() {
+            hamburger.classList.remove('open');
+            mobileNavOverlay.classList.remove('open');
+        }
+
+        // --- Home Page Hero Background Slider ---
+        const heroSliders = document.querySelectorAll('.hero-bg-slider');
+        let currentSlide = 0;
+
+        function startHeroSlider() {
+            // Set first slide active initially
+            if (heroSliders.length > 0) {
+                heroSliders[0].classList.add('active');
+            }
+
+            setInterval(() => {
+                heroSliders[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % heroSliders.length;
+                heroSliders[currentSlide].classList.add('active');
+            }, 5000); // Change image every 5 seconds
+        }
+        document.addEventListener('DOMContentLoaded', startHeroSlider);
+
+
+        // --- Live Notifications Logic (Enhanced) ---
+        const detailedNotifications = [
+            { img: 'https://randomuser.me/api/portraits/thumb/men/32.jpg', name: 'Ahmed', action: 'joined "ProFit Elite" package', fee: 'PKR 15,000' },
+            { img: 'https://randomuser.me/api/portraits/thumb/women/44.jpg', name: 'Fatima', action: 'booked a free trial session', fee: 'Free' },
+            { img: 'https://randomuser.me/api/portraits/thumb/men/19.jpg', name: 'Usman', action: 'started "Body Sculpt" program', fee: 'PKR 8,000' },
+            { img: 'https://randomuser.me/api/portraits/thumb/women/67.jpg', name: 'Sara', action: 'renewed "Extreme Core" membership', fee: 'PKR 25,000' },
+            { img: 'https://randomuser.me/api/portraits/thumb/men/12.jpg', name: 'Ali', action: 'signed up for 3-month plan', fee: 'PKR 8,000' },
+            { img: 'https://randomuser.me/api/portraits/thumb/women/23.jpg', name: 'Hina', action: 'completed her 30-day challenge!', fee: 'Success!' },
+            { img: 'https://randomuser.me/api/portraits/thumb/men/45.jpg', name: 'Kamran', action: 'joined the Morning HIIT class', fee: 'Included' },
+            { img: 'https://randomuser.me/api/portraits/thumb/women/78.jpg', name: 'Nadia', action: 'booked a nutritional consultation', fee: 'PKR 2,000' },
+            { img: 'https://randomuser.me/api/portraits/thumb/men/5.jpg', name: 'Zeeshan', action: 'purchased a 1-month plan', fee: 'PKR 3,000' },
+            { img: 'https://randomuser.me/api/portraits/thumb/women/10.jpg', name: 'Maria', action: 'achieved her weight loss goal!', fee: 'Milestone!' }
+        ];
+        const notificationElement = document.getElementById('live-notifications'); // Ensure this is accessible
+
+        function showNotification() {
+            // Check if current page is video-hub-page, classes-page, or privacy modal is open
+            if (currentPageId === 'video-hub-page' || currentPageId === 'classes-page' || privacyModalOverlay.classList.contains('show')) {
+                notificationElement.classList.remove('show');
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * detailedNotifications.length);
+            const notificationData = detailedNotifications[randomIndex];
+
+            notificationElement.innerHTML = `
+                <img src="${notificationData.img}" alt="${notificationData.name}" class="notification-avatar">
+                <div class="notification-text">
+                    <span><b>${notificationData.name}</b> ${notificationData.action} <small>(${notificationData.fee})</small></span>
+                    <small>Just now</small>
+                </div>
+            `;
+            notificationElement.classList.add('show');
+
+            setTimeout(() => {
+                notificationElement.classList.remove('show');
+            }, 4000); // Notification visible for 4 seconds
+        }
+
+        // --- Video Hub Logic (Your Provided JS) ---
+        function playVideo(videoUrl, clickedElement) {
+            const player = document.getElementById('mainPlayer');
+            const source = document.getElementById('mainSource');
+
+            source.src = videoUrl;
+            player.load();
+            player.play();
+            player.muted = false; // Unmute automatically when user clicks a new video
+
+            const allCards = document.querySelectorAll('.video-card');
+            allCards.forEach(card => {
+                card.classList.remove('active');
+            });
+
+            clickedElement.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- Booking Form Logic ---
+        const bookingForm = document.getElementById('bookingForm');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent actual form submission
+
+                const formData = new FormData(this);
+                const data = {};
+                for (const [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+                console.log('Booking Data:', data); // Log data for testing
+                alert('Thank you for your booking request! We will contact you shortly.');
+                this.reset(); // Clear the form
+            });
+        }
+
+        // --- Quick Contact Form Logic ---
+        const contactQuickForm = document.getElementById('contactQuickForm');
+        if (contactQuickForm) {
+            contactQuickForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent actual form submission
+                const formData = new FormData(this);
+                const data = {};
+                for (const [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                console.log('Quick Contact Data:', data); // Log data for testing
+                alert('Your message has been sent! We will get back to you soon.');
+                this.reset(); // Clear the form
+            });
+        }
+
+        // --- Membership FAQ Toggle Logic ---
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                question.classList.toggle('active');
+                if (answer.classList.contains('show')) {
+                    answer.classList.remove('show');
+                } else {
+                    // Close other open answers
+                    document.querySelectorAll('.faq-answer.show').forEach(openAnswer => {
+                        openAnswer.classList.remove('show');
+                        openAnswer.previousElementSibling.classList.remove('active');
+                    });
+                    answer.classList.add('show');
+                }
+            });
+        });
+
+    </script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Notifications - Blue & White Theme</title>
+<style>
+  /* Basic Body Style (White/Light Grey background for testing) */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6; /* Light theme background */
+    color: #333;
+    height: 100vh;
+  }
+
+  /* --- NOTIFICATION CONTAINER --- */
+  #live-notif-container {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+  }
+
+  /* --- INDIVIDUAL NOTIFICATION BOX (Blue & White Theme) --- */
+  .gym-notif {
+    background-color: #ffffff; /* White Box */
+    border-left: 5px solid #007bff; /* Vibrant Blue Border */
+    border-radius: 8px;
+    padding: 15px;
+    width: 320px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    
+    /* Animation */
+    transform: translateX(-150%);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+  }
+
+  .gym-notif.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  /* --- REAL IMAGE STYLES --- */
+  .notif-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover; 
+    border: 2px solid #007bff; /* Blue border around image */
+    flex-shrink: 0;
+  }
+
+  .notif-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .notif-name {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #111111; /* Dark text for white background */
+  }
+
+  .notif-action {
+    font-size: 0.85rem;
+    color: #555555; /* Grey text for action */
+  }
+
+  .notif-time {
+    font-size: 0.75rem;
+    color: #007bff; /* Blue color for time & verification */
+    font-weight: bold;
+    margin-top: 3px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 600px) {
+    #live-notif-container {
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+    }
+    .gym-notif {
+      width: auto; 
+    }
+  }
+</style>
+</head>
+<body>
+
+  <h1 style="text-align: center; padding-top: 50px; color: #333;">Premium Gym Content Here...</h1>
+  <p style="text-align: center; color: #666;">(Wait 2 seconds for the first notification. New one appears every 4.5 seconds)</p>
+
+  <!-- Container -->
+  <div id="live-notif-container"></div>
+
+  <script>
+    // --- GYM NOTIFICATION DATA (9 Items: Mostly English Girls) ---
+    const notifications =[
+      { 
+        name: "Emily Clark", 
+        action: "just bought the Premium Membership! 💎", 
+        time: "Just now", 
+        image: "https://randomuser.me/api/portraits/women/44.jpg" 
+      },
+      { 
+        name: "Jessica Taylor", 
+        action: "booked a VIP Pilates session. 🧘‍♀️", 
+        time: "1 min ago", 
+        image: "https://randomuser.me/api/portraits/women/68.jpg" 
+      },
+      { 
+        name: "Chloe Smith", 
+        action: "purchased Vanilla Whey Protein. 🥤", 
+        time: "2 mins ago", 
+        image: "https://randomuser.me/api/portraits/women/16.jpg" 
+      },
+      { 
+        name: "Sarah Johnson", 
+        action: "completed her 30-day challenge! 🏆", 
+        time: "4 mins ago", 
+        image: "https://randomuser.me/api/portraits/women/43.jpg" 
+      },
+      { 
+        name: "Liam Brown", 
+        action: "joined the Heavy Weight Batch. 🏋️‍♂️", 
+        time: "5 mins ago", 
+        image: "https://randomuser.me/api/portraits/men/32.jpg" 
+      },
+      { 
+        name: "Megan Davies", 
+        action: "just signed up for 12 Months Plan! 🚀", 
+        time: "8 mins ago", 
+        image: "https://randomuser.me/api/portraits/women/22.jpg" 
+      },
+      { 
+        name: "Olivia Wilson", 
+        action: "booked a Personal Training slot. 🔥", 
+        time: "10 mins ago", 
+        image: "https://randomuser.me/api/portraits/women/24.jpg" 
+      },
+      { 
+        name: "Sophie Evans", 
+        action: "bought the Gym Starter Kit. 🎒", 
+        time: "12 mins ago", 
+        image: "https://randomuser.me/api/portraits/women/12.jpg" 
+      },
+      { 
+        name: "Emma Thomas", 
+        action: "checked in for Zumba Class. 💃", 
+        time: "15 mins ago", 
+        image: "https://randomuser.me/api/portraits/women/33.jpg" 
+      }
+    ];
+
+    const container = document.getElementById('live-notif-container');
+    let currentIndex = 0;
+
+    function showNotification() {
+      const data = notifications[currentIndex];
+
+      const notifEl = document.createElement('div');
+      notifEl.className = 'gym-notif';
+      
+      notifEl.innerHTML = `
+        <img src="${data.image}" alt="${data.name}" class="notif-image">
+        <div class="notif-text">
+          <span class="notif-name">${data.name}</span>
+          <span class="notif-action">${data.action}</span>
+          <span class="notif-time">✓ Verified • ${data.time}</span>
+        </div>
+      `;
+
+      container.appendChild(notifEl);
+
+      // Slide in animation
+      setTimeout(() => {
+        notifEl.classList.add('show');
+      }, 100);
+
+      // 4 seconds tak screen par rahega, phir slide out hoga
+      setTimeout(() => {
+        notifEl.classList.remove('show');
+        setTimeout(() => {
+          notifEl.remove();
+        }, 600); 
+      }, 4000); 
+
+      // Next profile ke liye index update
+      currentIndex++;
+      if (currentIndex >= notifications.length) {
+        currentIndex = 0; 
+      }
+    }
+
+    // Pehla notification 2 seconds baad
+    setTimeout(() => {
+      showNotification();
+      
+      // Phir har 4.5 seconds baad (4500 ms) naya notification aata rahega
+      setInterval(showNotification, 4500); 
+    }, 2000);
+
+  </script>
+
+</body>
+</html>

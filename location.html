@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Location & Hours — Crate Coffee Co</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .page-head{background:var(--espresso);color:var(--paper-soft);padding:64px 0 44px;}
+  .page-head p{color:rgba(243,236,221,.78);}
+</style>
+</head>
+<body data-page="location">
+
+<div id="site-header"></div>
+<div id="cart-mount"></div>
+
+<header class="page-head">
+  <div class="wrap">
+    <div class="hero-eyebrow" style="color:var(--gold-bright);">Visit us</div>
+    <h1 style="color:var(--paper-soft);">Location &amp; hours</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap two-col">
+    <div>
+      <iframe class="map-frame" id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div style="margin-top:18px;">
+        <a class="btn btn-outline-dark" id="directionsBtn" target="_blank" rel="noopener">Get directions</a>
+      </div>
+    </div>
+    <div>
+      <h3>Address</h3>
+      <p id="addressText">—</p>
+      <h3>Opening hours</h3>
+      <table class="hours-table" id="hoursTable"></table>
+      <h3 style="margin-top:28px;">Around Loughton</h3>
+      <ul class="nearby" id="nearbyList"></ul>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+(async () => {
+  const settings = await mountLayout('location');
+  document.getElementById('mapFrame').src = settings.mapEmbed;
+  document.getElementById('addressText').textContent = settings.address;
+  document.getElementById('directionsBtn').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(settings.address);
+  document.getElementById('hoursTable').innerHTML = settings.hours.map(h => `
+    <tr><td>${h.day}</td><td>${h.time}</td></tr>
+  `).join('');
+  document.getElementById('nearbyList').innerHTML = (settings.places || []).map(p => `
+    <li><strong>${p.name}</strong><span>${p.note}</span></li>
+  `).join('');
+})();
+</script>
+</body>
+</html>

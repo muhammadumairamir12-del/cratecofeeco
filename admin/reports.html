@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports — Crate Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="admin-shell">
+  <div id="admin-sidebar"></div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1 style="font-size:1.6rem;">Reports</h1>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="rToday">—</div><div class="lbl">Today</div></div>
+      <div class="stat-card"><div class="num" id="rWeek">—</div><div class="lbl">Last 7 days</div></div>
+      <div class="stat-card"><div class="num" id="rMonth">—</div><div class="lbl">Last 30 days</div></div>
+      <div class="stat-card"><div class="num" id="rAvg">—</div><div class="lbl">Average order value</div></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Monthly trend (last 6 months)</h3>
+      <canvas id="monthChart" height="90"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/icons.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+async function loadReports(){
+  let snap;
+  try{
+    snap = await db.collection('orders').where('status', '!=', 'Cancelled').get();
+  }catch(e){
+    snap = await db.collection('orders').get();
+  }
+  const orders = snap.docs.map(d => d.data()).filter(o => o.createdAt && o.createdAt.toDate && o.status !== 'Cancelled');
+  const now = new Date();
+  const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+
+  const sum = list => list.reduce((s, o) => s + (o.total || 0), 0);
+  const today = orders.filter(o => o.createdAt.toDate().toDateString() === now.toDateString());
+  const week = orders.filter(o => o.createdAt.toDate() >= daysAgo(7));
+  const month = orders.filter(o => o.createdAt.toDate() >= daysAgo(30));
+
+  document.getElementById('rToday').textContent = formatPrice(sum(today));
+  document.getElementById('rWeek').textContent = formatPrice(sum(week));
+  document.getElementById('rMonth').textContent = formatPrice(sum(month));
+  document.getElementById('rAvg').textContent = orders.length ? formatPrice(Math.round(sum(orders) / orders.length)) : formatPrice(0);
+
+  const months = [...Array(6)].map((_, i) => {
+    const d = new Date(); d.setMonth(d.getMonth() - (5 - i)); d.setDate(1);
+    return d;
+  });
+  const totals = months.map(m => sum(orders.filter(o => {
+    const d = o.createdAt.toDate();
+    return d.getMonth() === m.getMonth() && d.getFullYear() === m.getFullYear();
+  })));
+
+  new Chart(document.getElementById('monthChart'), {
+    type: 'bar',
+    data: {
+      labels: months.map(m => m.toLocaleDateString(undefined, { month: 'short', year: '2-digit' })),
+      datasets: [{ label: 'Sales', data: totals, backgroundColor: '#C89B3C', borderRadius: 4 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => formatPrice(v) } } } }
+  });
+}
+
+requireAdmin().then(() => {
+  renderAdminShell('reports');
+  loadReports();
+});
+</script>
+</body>
+</html>

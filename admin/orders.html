@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orders — Crate Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .order-row td{vertical-align:top;}
+  .items-list{font-size:.84rem;color:var(--ink-soft);}
+  select.status-select{padding:7px 10px;border-radius:3px;border:1px solid var(--line);font-size:.84rem;background:var(--paper-soft);}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+  <div id="admin-sidebar"></div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1 style="font-size:1.6rem;">Orders</h1>
+    </div>
+    <div class="cat-row" id="statusFilter" style="margin-bottom:20px;"></div>
+    <div class="admin-card">
+      <table class="admin-table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/icons.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+const STATUSES = ['Received', 'Preparing', 'Ready', 'Completed', 'Cancelled'];
+let ACTIVE_FILTER = 'All';
+let ORDERS = [];
+
+function renderFilters(){
+  const opts = ['All', ...STATUSES];
+  document.getElementById('statusFilter').innerHTML = opts.map(s =>
+    `<button class="cat-chip ${s === ACTIVE_FILTER ? 'active' : ''}" data-s="${s}">${s}</button>`
+  ).join('');
+  document.querySelectorAll('#statusFilter .cat-chip').forEach(btn => {
+    btn.addEventListener('click', () => { ACTIVE_FILTER = btn.dataset.s; renderFilters(); renderOrders(); });
+  });
+}
+
+function renderOrders(){
+  const list = ACTIVE_FILTER === 'All' ? ORDERS : ORDERS.filter(o => o.status === ACTIVE_FILTER);
+  document.getElementById('ordersBody').innerHTML = list.length ? list.map(o => `
+    <tr class="order-row">
+      <td>
+        <div style="font-weight:600;">#${o.id.slice(-6).toUpperCase()}</div>
+        <div style="font-size:.78rem;color:var(--ink-soft);">${fmtDate(o.createdAt)}</div>
+      </td>
+      <td>
+        <div>${o.customerName || '—'}</div>
+        <div style="font-size:.78rem;color:var(--ink-soft);">${o.phone || ''}</div>
+        <div style="font-size:.78rem;color:var(--ink-soft);">${o.paymentMethod || ''}</div>
+      </td>
+      <td class="items-list">${(o.items || []).map(i => `${i.qty}× ${i.name}`).join('<br>')}</td>
+      <td style="font-weight:600;">${formatPrice(o.total || 0)}</td>
+      <td>
+        <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+          ${STATUSES.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="5" style="color:var(--ink-soft);">No orders in this view yet.</td></tr>';
+}
+
+window.updateStatus = async (id, status) => {
+  await db.collection('orders').doc(id).update({ status });
+  const o = ORDERS.find(x => x.id === id);
+  if (o) o.status = status;
+};
+
+async function loadOrders(){
+  const snap = await db.collection('orders').orderBy('createdAt', 'desc').limit(300).get();
+  ORDERS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderOrders();
+}
+
+requireAdmin().then(() => {
+  renderAdminShell('orders');
+  renderFilters();
+  loadOrders();
+});
+</script>
+</body>
+</html>

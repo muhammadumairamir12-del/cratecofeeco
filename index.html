@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crate Coffee Co — Loughton</title>
+<meta name="description" content="Coffee, pastries, and cakes on High Road, Loughton. Prices in dollars. Pay with Stripe.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  @keyframes floatUp{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:translateY(0);} }
+  .hero h1, .hero p.lede, .hero-actions, .hero-eyebrow{animation:floatUp .7s ease both;}
+  .hero p.lede{animation-delay:.08s;}
+  .hero-actions{animation-delay:.16s;}
+  .hero-art{animation:floatUp .8s ease .1s both;}
+  .strip{background:var(--paper-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .strip .wrap{display:flex;gap:44px;flex-wrap:wrap;justify-content:space-between;padding:28px 28px;}
+  .strip .item{display:flex;align-items:center;gap:12px;font-size:.92rem;color:var(--ink-soft);}
+  .strip .item svg{width:22px;height:22px;color:var(--gold);flex:none;}
+  .feat-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+</style>
+</head>
+<body data-page="home">
+
+<div id="site-header"></div>
+<div id="cart-mount"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="hero-eyebrow">High Road · Loughton</div>
+      <h1>Slow coffee, baked&nbsp;the same way.</h1>
+      <p class="lede">Espresso, iced drinks, and the morning bake — poured on High Road in Loughton. Every price on the menu is in dollars.</p>
+      <div class="hero-actions">
+        <a href="menu.html" class="btn btn-gold">View menu</a>
+        <a href="location.html" class="btn btn-outline">Find us</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <img class="hero-photo" src="images/hero.jpg" alt="Three cups of coffee raised together at the table">
+    </div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap">
+    <div class="item" id="iconClock"></div>
+    <div class="item" id="iconLocation"></div>
+    <div class="item" id="iconLeaf">Small-batch, baked daily</div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap shop-layout">
+    <div>
+      <div class="feat-head section-head">
+        <div>
+          <h2>From this week's crate</h2>
+          <p>Coffee and bakes worth ordering ahead.</p>
+        </div>
+        <a href="menu.html" class="btn btn-outline-dark">Full menu</a>
+      </div>
+      <div class="crate-grid" id="featuredGrid"></div>
+    </div>
+    <aside class="place-side" id="placeSide"></aside>
+  </div>
+</section>
+
+<section class="on-dark">
+  <div class="wrap two-col">
+    <div>
+      <div class="hero-eyebrow">Our story</div>
+      <h2>Three crates and a borrowed espresso machine.</h2>
+      <p id="aboutTeaser">That's how Crate Coffee Co started — and the reason we still bake everything ourselves, every morning.</p>
+      <a href="about.html" class="btn btn-outline">Read our story</a>
+    </div>
+    <img class="story-photo" src="images/shop.jpg" alt="Pour-over coffee being brewed on the bar">
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap" style="text-align:center;">
+    <div class="hero-eyebrow" style="color:var(--brick);">Follow along</div>
+    <h2>@cratecoffeeco</h2>
+    <p style="margin:0 auto 20px;">Daily bakes, behind-the-scenes and new syrup drops.</p>
+    <div class="social-row" style="justify-content:center;">
+      <a href="https://www.instagram.com/cratecoffeeco" target="_blank" rel="noopener" class="social-pill">Instagram</a>
+      <a href="https://www.tiktok.com/@cratecoffeeco" target="_blank" rel="noopener" class="social-pill">TikTok</a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+document.getElementById('iconClock').innerHTML = iconMarkup('cup') + 'Fresh coffee & bakes, daily';
+document.getElementById('iconLocation').innerHTML = iconMarkup('crate') + '42 High Road, Loughton';
+
+async function renderFeatured(){
+  const products = await fetchProducts();
+  const picks = products.filter(p => p.inStock && p.category === 'Coffee').slice(0, 4);
+  document.getElementById('featuredGrid').innerHTML = picks.map(p => `
+    <div class="crate-card">
+      <div class="stamp-icon">${productArt(p)}</div>
+      <h3>${p.name}</h3>
+      <div class="desc">${p.desc || ''}</div>
+      <div class="row">
+        <span class="price">${formatPrice(p.price)}</span>
+        <button class="add-btn" onclick='addToCart(${jsonAttr(p)})'>Add</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+(async () => {
+  const settings = await mountLayout('home');
+  document.getElementById('placeSide').innerHTML = renderPlaceSide(settings);
+  document.getElementById('iconLocation').innerHTML = iconMarkup('crate') + settings.address;
+  document.getElementById('aboutTeaser').textContent = (settings.aboutText || '').split('. ').slice(0,1).join('. ') + '.';
+  renderFeatured();
+})();
+</script>
+</body>
+</html>

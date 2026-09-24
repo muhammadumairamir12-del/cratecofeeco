@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Products — Crate Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .prod-thumb{width:44px;height:44px;background:var(--paper);border-radius:3px;padding:6px;flex:none;}
+  .prod-thumb img{width:100%;height:100%;object-fit:cover;border-radius:2px;}
+  .name-cell{display:flex;align-items:center;gap:12px;}
+  .cat-manage{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+  .cat-tag{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 16px;font-size:.84rem;display:flex;align-items:center;gap:8px;}
+  .cat-tag button{background:none;border:none;color:var(--brick);font-size:.9rem;}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+  <div id="admin-sidebar"></div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1 style="font-size:1.6rem;">Products</h1>
+      <button class="btn btn-gold" id="addProductBtn">Add product</button>
+    </div>
+
+    <div class="admin-card">
+      <h3 style="margin-bottom:12px;">Categories</h3>
+      <div class="cat-manage" id="catManage"></div>
+      <form id="addCatForm" style="display:flex;gap:10px;max-width:340px;">
+        <input type="text" id="newCatName" placeholder="New category name" style="flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:3px;">
+        <button class="btn btn-outline-dark" type="submit">Add</button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <table class="admin-table">
+        <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Status</th><th></th></tr></thead>
+        <tbody id="productsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="productModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Add product</h3>
+    <form id="productForm">
+      <input type="hidden" id="prodId">
+      <div class="field">
+        <label for="prodName">Name</label>
+        <input type="text" id="prodName" required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="prodCategory">Category</label>
+          <select id="prodCategory" required></select>
+        </div>
+        <div class="field">
+          <label for="prodPrice">Price ($)</label>
+          <input type="number" id="prodPrice" min="0" step="0.01" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="prodDesc">Short description</label>
+        <input type="text" id="prodDesc">
+      </div>
+      <div class="field">
+        <label for="prodIcon">Placeholder icon (used until a photo is uploaded)</label>
+        <select id="prodIcon">
+          <option value="cup">Coffee cup</option>
+          <option value="cake">Cake</option>
+          <option value="cake2">Cake (tiered)</option>
+          <option value="pastry">Pastry</option>
+          <option value="cookie">Cookie</option>
+          <option value="bottle">Syrup bottle</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="prodImage">Product photo (optional)</label>
+        <input type="file" id="prodImage" accept="image/*">
+        <div id="uploadStatus" style="font-size:.8rem;color:var(--ink-soft);margin-top:6px;"></div>
+      </div>
+      <div class="field" style="display:flex;align-items:center;gap:12px;">
+        <span class="toggle-switch on" id="stockToggle"><span class="knob"></span></span>
+        <label style="margin:0;" id="stockLabel">In stock</label>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button type="button" class="btn btn-outline-dark" id="cancelModal" style="flex:1;">Cancel</button>
+        <button type="submit" class="btn btn-gold" style="flex:1;" id="saveProductBtn">Save product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/icons.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+let CATEGORIES = [];
+let PENDING_FILE = null;
+let STOCK_ON = true;
+
+function openModal(product){
+  document.getElementById('productModal').classList.add('open');
+  document.getElementById('modalTitle').textContent = product ? 'Edit product' : 'Add product';
+  document.getElementById('prodId').value = product ? product.id : '';
+  document.getElementById('prodName').value = product ? product.name : '';
+  document.getElementById('prodPrice').value = product ? product.price : '';
+  document.getElementById('prodDesc').value = product ? (product.desc || '') : '';
+  document.getElementById('prodIcon').value = product ? (product.icon || 'cake') : 'cake';
+  document.getElementById('prodCategory').innerHTML = CATEGORIES.map(c => `<option ${product && product.category === c ? 'selected' : ''}>${c}</option>`).join('');
+  document.getElementById('uploadStatus').textContent = product && product.imageUrl ? 'Photo already uploaded — choose a new file to replace it.' : '';
+  STOCK_ON = product ? product.inStock !== false : true;
+  syncStockToggle();
+  PENDING_FILE = null;
+  document.getElementById('prodImage').value = '';
+}
+function closeModal(){ document.getElementById('productModal').classList.remove('open'); }
+function syncStockToggle(){
+  const el = document.getElementById('stockToggle');
+  el.classList.toggle('on', STOCK_ON);
+  document.getElementById('stockLabel').textContent = STOCK_ON ? 'In stock' : 'Out of stock';
+}
+
+document.getElementById('addProductBtn').addEventListener('click', () => openModal(null));
+document.getElementById('cancelModal').addEventListener('click', closeModal);
+document.getElementById('stockToggle').addEventListener('click', () => { STOCK_ON = !STOCK_ON; syncStockToggle(); });
+document.getElementById('prodImage').addEventListener('change', (e) => { PENDING_FILE = e.target.files[0] || null; });
+
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('saveProductBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const id = document.getElementById('prodId').value;
+  const payload = {
+    name: document.getElementById('prodName').value.trim(),
+    category: document.getElementById('prodCategory').value,
+    price: Number(document.getElementById('prodPrice').value),
+    desc: document.getElementById('prodDesc').value.trim(),
+    icon: document.getElementById('prodIcon').value,
+    inStock: STOCK_ON
+  };
+
+  try{
+    if (PENDING_FILE){
+      document.getElementById('uploadStatus').textContent = 'Uploading photo…';
+      const path = `products/${Date.now()}-${PENDING_FILE.name}`;
+      const ref = firebase.storage().ref().child(path);
+      await ref.put(PENDING_FILE);
+      payload.imageUrl = await ref.getDownloadURL();
+    }
+    if (id){
+      await db.collection('products').doc(id).update(payload);
+    } else {
+      await db.collection('products').add(payload);
+    }
+    closeModal();
+    loadProducts();
+  }catch(err){
+    alert('Could not save the product. If the image upload failed, check that Firebase Storage is set up for this project (see README).');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Save product';
+});
+
+function productRow(p){
+  return `
+  <tr>
+    <td>
+      <div class="name-cell">
+        <div class="prod-thumb">${productArt(p)}</div>
+        <div>
+          <div style="font-weight:600;">${p.name}</div>
+          <div style="font-size:.8rem;color:var(--ink-soft);">${p.desc || ''}</div>
+        </div>
+      </div>
+    </td>
+    <td>${p.category}</td>
+    <td>${formatPrice(p.price)}</td>
+    <td><span class="pill-status ${p.inStock === false ? 'pill-cancelled' : 'pill-ready'}">${p.inStock === false ? 'Out of stock' : 'In stock'}</span></td>
+    <td style="text-align:right;">
+      <button class="icon-btn" onclick='editProduct(${jsonAttr(p)})'>Edit</button>
+      <button class="icon-btn" onclick="deleteProduct('${p.id}')">Delete</button>
+    </td>
+  </tr>`;
+}
+
+let PRODUCTS_CACHE = [];
+window.editProduct = (p) => openModal(p);
+window.deleteProduct = async (id) => {
+  if (!confirm('Delete this product?')) return;
+  await db.collection('products').doc(id).delete();
+  loadProducts();
+};
+
+async function loadProducts(){
+  const snap = await db.collection('products').orderBy('category').get();
+  PRODUCTS_CACHE = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  CATEGORIES = [...new Set(PRODUCTS_CACHE.map(p => p.category))];
+  if (!CATEGORIES.length) CATEGORIES = ['Cakes', 'Pastries', 'Cookies', 'Syrups'];
+  renderCategoryManage();
+  document.getElementById('productsBody').innerHTML = PRODUCTS_CACHE.length
+    ? PRODUCTS_CACHE.map(productRow).join('')
+    : '<tr><td colspan="5" style="color:var(--ink-soft);">No products yet — add your first one, or seed demo data from the Dashboard.</td></tr>';
+}
+
+function renderCategoryManage(){
+  document.getElementById('catManage').innerHTML = CATEGORIES.map(c => `
+    <span class="cat-tag">${c} <button onclick="removeCategory('${c}')" title="Remove (only if unused)">✕</button></span>
+  `).join('');
+}
+window.removeCategory = (cat) => {
+  if (PRODUCTS_CACHE.some(p => p.category === cat)){
+    alert('This category still has products in it — move or delete them first.');
+    return;
+  }
+  CATEGORIES = CATEGORIES.filter(c => c !== cat);
+  renderCategoryManage();
+};
+document.getElementById('addCatForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('newCatName');
+  const name = input.value.trim();
+  if (name && !CATEGORIES.includes(name)) CATEGORIES.push(name);
+  input.value = '';
+  renderCategoryManage();
+});
+
+requireAdmin().then(() => {
+  renderAdminShell('products');
+  loadProducts();
+});
+</script>
+</body>
+</html>

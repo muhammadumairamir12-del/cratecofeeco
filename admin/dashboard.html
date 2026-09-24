@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — Crate Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="admin-shell">
+  <div id="admin-sidebar"></div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h1 style="font-size:1.6rem;">Dashboard</h1>
+        <p style="margin:0;color:var(--ink-soft);" id="todayDate"></p>
+      </div>
+      <a href="../menu.html" target="_blank" class="btn btn-outline-dark">View live site</a>
+    </div>
+
+    <div class="demo-note" id="seedBanner" style="display:none;">
+      No products found yet. <button class="icon-btn" id="seedBtn" style="margin-left:8px;">Seed demo catalogue</button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="statOrders">—</div><div class="lbl">Orders today</div></div>
+      <div class="stat-card"><div class="num" id="statSales">—</div><div class="lbl">Sales today</div></div>
+      <div class="stat-card"><div class="num" id="statPending">—</div><div class="lbl">Awaiting action</div></div>
+      <div class="stat-card"><div class="num" id="statProducts">—</div><div class="lbl">Products live</div></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Sales — last 7 days</h3>
+      <canvas id="salesChart" height="90"></canvas>
+    </div>
+
+    <div class="admin-card">
+      <h3>Most ordered items</h3>
+      <table class="admin-table" id="popularTable">
+        <thead><tr><th>Item</th><th>Units sold</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/icons.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+
+async function loadDashboard(){
+  renderAdminShell('dashboard');
+
+  const productsSnap = await db.collection('products').get();
+  document.getElementById('seedBanner').style.display = productsSnap.empty ? 'block' : 'none';
+  document.getElementById('statProducts').textContent = productsSnap.size;
+
+  document.getElementById('seedBtn')?.addEventListener('click', async () => {
+    await seedDemoData();
+    location.reload();
+  });
+
+  const ordersSnap = await db.collection('orders').orderBy('createdAt', 'desc').limit(200).get();
+  const orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  const todays = orders.filter(o => isToday(o.createdAt));
+  document.getElementById('statOrders').textContent = todays.length;
+  document.getElementById('statSales').textContent = formatPrice(todays.reduce((s, o) => s + (o.total || 0), 0));
+  document.getElementById('statPending').textContent = orders.filter(o => ['Received', 'Preparing'].includes(o.status)).length;
+
+  // popular items across all loaded orders
+  const tally = {};
+  orders.forEach(o => (o.items || []).forEach(i => { tally[i.name] = (tally[i.name] || 0) + i.qty; }));
+  const popular = Object.entries(tally).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  document.querySelector('#popularTable tbody').innerHTML = popular.length
+    ? popular.map(([name, qty]) => `<tr><td>${name}</td><td>${qty}</td></tr>`).join('')
+    : '<tr><td colspan="2" style="color:var(--ink-soft);">No orders yet — once customers order, this fills in.</td></tr>';
+
+  // last 7 days sales for the chart
+  const days = [...Array(7)].map((_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d;
+  });
+  const totalsByDay = days.map(d => {
+    return orders.filter(o => o.createdAt && o.createdAt.toDate && o.createdAt.toDate().toDateString() === d.toDateString())
+      .reduce((s, o) => s + (o.total || 0), 0);
+  });
+
+  new Chart(document.getElementById('salesChart'), {
+    type: 'line',
+    data: {
+      labels: days.map(d => d.toLocaleDateString(undefined, { weekday: 'short' })),
+      datasets: [{
+        label: 'Sales',
+        data: totalsByDay,
+        borderColor: '#C89B3C',
+        backgroundColor: 'rgba(200,155,60,0.15)',
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { callback: v => formatPrice(v) } } }
+    }
+  });
+}
+
+requireAdmin().then(loadDashboard);
+</script>
+</body>
+</html>

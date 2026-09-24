@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — Crate Coffee Co</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .checkout-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:44px;align-items:flex-start;}
+  @media (max-width:900px){.checkout-wrap{grid-template-columns:1fr;}}
+  .pay-tabs{display:flex;gap:10px;margin-bottom:18px;}
+  .pay-tab{flex:1;padding:12px;text-align:center;border:1px solid var(--line);border-radius:var(--radius-crate);font-size:.9rem;font-weight:600;background:var(--paper-soft);}
+  .pay-tab.active{border-color:var(--gold);background:#fff;box-shadow:0 0 0 1px var(--gold) inset;}
+  .summary-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--radius-crate);padding:22px;position:sticky;top:96px;}
+  .summary-line{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem;}
+  .summary-total{display:flex;justify-content:space-between;padding-top:14px;font-weight:700;font-size:1.1rem;}
+  .demo-note{background:#fff5e0;border:1px solid var(--gold);border-radius:3px;padding:12px 14px;font-size:.82rem;margin-bottom:18px;color:#6a4d10;}
+  .success-screen{text-align:center;padding:70px 20px;display:none;}
+  .success-screen.show{display:block;}
+  .success-check{width:74px;height:74px;border-radius:50%;background:var(--gold);color:var(--espresso);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:2rem;}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body data-page="checkout">
+
+<div id="site-header"></div>
+<div id="cart-mount"></div>
+
+<section>
+  <div class="wrap" id="checkoutView">
+    <div class="section-head">
+      <h1 style="font-family:var(--font-display);">Checkout</h1>
+      <p>Orders go straight to our kitchen — no phone call needed.</p>
+    </div>
+    <div class="checkout-wrap" id="checkoutForm">
+      <div>
+        <form id="orderForm">
+          <h3>Delivery details</h3>
+          <div class="field">
+            <label for="custName">Full name</label>
+            <input type="text" id="custName" required placeholder="Your name">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="custPhone">Phone number</label>
+              <input type="tel" id="custPhone" required placeholder="020 7946 0991">
+            </div>
+            <div class="field">
+              <label for="custEmail">Email (optional)</label>
+              <input type="email" id="custEmail" placeholder="you@email.com">
+            </div>
+          </div>
+          <div class="field">
+            <label for="custAddress">Delivery address</label>
+            <textarea id="custAddress" rows="2" required placeholder="House number and street, Loughton"></textarea>
+          </div>
+          <div class="field">
+            <label for="custNote">Order note (optional)</label>
+            <input type="text" id="custNote" placeholder="e.g. less sweet, ring the bell">
+          </div>
+
+          <h3 style="margin-top:30px;">Payment</h3>
+          <div class="stripe-box">
+            <div class="stripe-mark"><i>S</i> Stripe</div>
+            <p style="margin:0;font-size:.9rem;color:var(--ink-soft);">Card, Apple Pay, and Google Pay. Stripe is the only way to pay — we don’t take cash on delivery.</p>
+          </div>
+          <p id="payNote" class="demo-note" style="display:none;"></p>
+          <button type="submit" class="btn btn-stripe" id="payBtn" style="margin-top:8px;">Pay with Stripe</button>
+        </form>
+      </div>
+
+      <div class="summary-card">
+        <h3>Order summary</h3>
+        <div id="summaryLines"></div>
+        <div class="summary-total"><span>Total</span><span id="summaryTotal">$0.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap success-screen" id="successScreen">
+    <div class="success-check">✓</div>
+    <h2>Order placed</h2>
+    <p style="margin:0 auto 6px;">Stripe payment received. Order <strong id="orderIdText"></strong> is with our kitchen.</p>
+    <p style="margin:0 auto 26px;">We'll update the status as it moves from Received to Ready.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="menu.html" class="btn btn-outline-dark">Order more</a>
+      <a href="track-order.html" class="btn btn-outline-dark">Track this order</a>
+      <a href="index.html" class="btn btn-gold">Back to home</a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+const PENDING_KEY = 'crate_pending_order';
+
+function renderSummary(){
+  const cart = getCart();
+  const items = Object.values(cart);
+  document.getElementById('summaryLines').innerHTML = items.map(i => `
+    <div class="summary-line"><span>${i.qty} × ${i.name}</span><span>${formatPrice(i.price * i.qty)}</span></div>
+  `).join('') || '<p style="color:var(--ink-soft);">Your crate is empty — add something from the menu first.</p>';
+  document.getElementById('summaryTotal').textContent = formatPrice(cartTotal());
+  const btn = document.getElementById('payBtn');
+  if (btn) btn.disabled = items.length === 0;
+}
+
+function showPaid(orderId){
+  document.getElementById('orderIdText').textContent = '#' + String(orderId).slice(-6).toUpperCase();
+  document.getElementById('checkoutView').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+}
+
+function showPayNote(message){
+  const note = document.getElementById('payNote');
+  note.style.display = 'block';
+  note.textContent = message;
+}
+
+function customerDetails(){
+  return {
+    customerName: document.getElementById('custName').value.trim(),
+    phone: document.getElementById('custPhone').value.trim(),
+    email: document.getElementById('custEmail').value.trim(),
+    address: document.getElementById('custAddress').value.trim(),
+    note: document.getElementById('custNote').value.trim()
+  };
+}
+
+document.getElementById('orderForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const items = Object.values(getCart());
+  if (!items.length) return;
+
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Opening Stripe…';
+  showPayNote('');
+  document.getElementById('payNote').style.display = 'none';
+
+  const order = {
+    ...customerDetails(),
+    paymentMethod: 'Stripe',
+    items: items.map(i => ({ name: i.name, price: i.price, qty: i.qty })),
+    total: cartTotal()
+  };
+
+  try{
+    const res = await fetch('/.netlify/functions/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: order.items.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        email: order.email,
+        successUrl: location.origin + location.pathname + '?paid=1',
+        cancelUrl: location.origin + location.pathname + '?cancelled=1'
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.url){
+      throw new Error(data.error || 'Stripe checkout is not available yet.');
+    }
+    sessionStorage.setItem(PENDING_KEY, JSON.stringify(order));
+    location.href = data.url;
+  }catch(err){
+    showPayNote('Stripe is the only payment method. Add STRIPE_SECRET_KEY in Netlify (or your host) so this button can open a real card checkout. ' + (err.message || ''));
+    btn.disabled = false;
+    btn.textContent = 'Pay with Stripe';
+  }
+});
+
+(async () => {
+  await mountLayout('menu');
+  const params = new URLSearchParams(location.search);
+
+  if (params.get('cancelled') === '1'){
+    showPayNote('Stripe checkout was cancelled. Your crate is still here — you can pay when you’re ready.');
+  }
+
+  if (params.get('paid') === '1'){
+    const pending = JSON.parse(sessionStorage.getItem(PENDING_KEY) || 'null');
+    if (pending){
+      try{
+        const id = await placeOrder({
+          ...pending,
+          paymentMethod: 'Stripe',
+          paymentStatus: 'paid',
+          stripeSessionId: params.get('session_id') || ''
+        });
+        clearCart();
+        sessionStorage.removeItem(PENDING_KEY);
+        showPaid(id);
+        return;
+      }catch(err){
+        showPayNote('Stripe took the payment, but the order could not be saved. Contact the shop with your Stripe receipt.');
+      }
+    }
+  }
+
+  renderSummary();
+})();
+</script>
+</body>
+</html>

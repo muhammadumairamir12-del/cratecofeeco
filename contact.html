@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — Crate Coffee Co</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .page-head{background:var(--espresso);color:var(--paper-soft);padding:64px 0 44px;}
+  .page-head p{color:rgba(243,236,221,.78);}
+  .contact-line{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);}
+  .contact-line svg{width:22px;height:22px;color:var(--gold);flex:none;}
+</style>
+</head>
+<body data-page="contact">
+
+<div id="site-header"></div>
+<div id="cart-mount"></div>
+
+<header class="page-head">
+  <div class="wrap">
+    <div class="hero-eyebrow" style="color:var(--gold-bright);">Say hello</div>
+    <h1 style="color:var(--paper-soft);">Contact us</h1>
+  </div>
+</header>
+
+<section>
+  <div class="wrap two-col">
+    <div>
+      <div class="contact-line" id="lnPhone"></div>
+      <div class="contact-line" id="lnWhatsapp"></div>
+      <div class="contact-line" id="lnEmail"></div>
+      <div class="contact-line" id="lnAddress"></div>
+    </div>
+    <div>
+      <form id="contactForm">
+        <div class="field">
+          <label for="cName">Name</label>
+          <input type="text" id="cName" required>
+        </div>
+        <div class="field">
+          <label for="cEmail">Email</label>
+          <input type="email" id="cEmail" required>
+        </div>
+        <div class="field">
+          <label for="cMsg">Message</label>
+          <textarea id="cMsg" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-gold btn-block">Send message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+(async () => {
+  const settings = await mountLayout('contact');
+  document.getElementById('lnPhone').innerHTML = iconMarkup('cup') + `<a href="tel:${settings.phone}">${settings.phone}</a>`;
+  document.getElementById('lnWhatsapp').innerHTML = iconMarkup('leaf') + `<a href="https://wa.me/${settings.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener">WhatsApp: ${settings.whatsapp}</a>`;
+  document.getElementById('lnEmail').innerHTML = iconMarkup('bottle') + `<a href="mailto:${settings.email}">${settings.email}</a>`;
+  document.getElementById('lnAddress').innerHTML = iconMarkup('crate') + `<span>${settings.address}</span>`;
+})();
+
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  try{
+    await db.collection('messages').add({
+      name: document.getElementById('cName').value.trim(),
+      email: document.getElementById('cEmail').value.trim(),
+      message: document.getElementById('cMsg').value.trim(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    e.target.reset();
+    showToast("Message sent — we'll get back to you soon.");
+  }catch(err){
+    showToast('Could not send — please try again.');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Send message';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings — Crate Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .hours-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-bottom:10px;align-items:center;}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+  <div id="admin-sidebar"></div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h1 style="font-size:1.6rem;">Hours &amp; info</h1>
+      <button class="btn btn-gold" id="saveBtn">Save changes</button>
+    </div>
+
+    <div class="admin-card">
+      <h3>Contact &amp; address</h3>
+      <div class="field-row">
+        <div class="field"><label>Phone</label><input type="text" id="sPhone"></div>
+        <div class="field"><label>WhatsApp number</label><input type="text" id="sWhatsapp"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Email</label><input type="email" id="sEmail"></div>
+        <div class="field"><label>Address</label><input type="text" id="sAddress"></div>
+      </div>
+      <div class="field"><label>Google Maps embed URL</label><input type="text" id="sMap" placeholder="https://www.google.com/maps?q=...&output=embed"></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Opening hours</h3>
+      <div id="hoursRows"></div>
+      <button class="icon-btn" id="addHourRow" type="button">+ Add row</button>
+    </div>
+
+    <div class="admin-card">
+      <h3>Social links</h3>
+      <div class="field-row">
+        <div class="field"><label>Instagram URL</label><input type="text" id="sInstagram"></div>
+        <div class="field"><label>TikTok URL</label><input type="text" id="sTiktok"></div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3>About text</h3>
+      <div class="field"><textarea id="sAbout" rows="4"></textarea></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/icons.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+let HOURS = [];
+
+function renderHours(){
+  document.getElementById('hoursRows').innerHTML = HOURS.map((h, i) => `
+    <div class="hours-row">
+      <input type="text" value="${h.day}" onchange="HOURS[${i}].day=this.value">
+      <input type="text" value="${h.time}" onchange="HOURS[${i}].time=this.value">
+      <button class="icon-btn" onclick="HOURS.splice(${i},1); renderHours();">Remove</button>
+    </div>
+  `).join('');
+}
+document.getElementById('addHourRow').addEventListener('click', () => {
+  HOURS.push({ day: 'Day', time: '9:00 AM – 9:00 PM' });
+  renderHours();
+});
+
+async function loadSettings(){
+  const s = await fetchSettings();
+  document.getElementById('sPhone').value = s.phone;
+  document.getElementById('sWhatsapp').value = s.whatsapp;
+  document.getElementById('sEmail').value = s.email;
+  document.getElementById('sAddress').value = s.address;
+  document.getElementById('sMap').value = s.mapEmbed;
+  document.getElementById('sInstagram').value = s.instagram;
+  document.getElementById('sTiktok').value = s.tiktok;
+  document.getElementById('sAbout').value = s.aboutText;
+  HOURS = JSON.parse(JSON.stringify(s.hours));
+  renderHours();
+}
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  const payload = {
+    phone: document.getElementById('sPhone').value.trim(),
+    whatsapp: document.getElementById('sWhatsapp').value.trim(),
+    email: document.getElementById('sEmail').value.trim(),
+    address: document.getElementById('sAddress').value.trim(),
+    mapEmbed: document.getElementById('sMap').value.trim(),
+    instagram: document.getElementById('sInstagram').value.trim(),
+    tiktok: document.getElementById('sTiktok').value.trim(),
+    aboutText: document.getElementById('sAbout').value.trim(),
+    hours: HOURS
+  };
+  await db.collection('settings').doc('general').set(payload, { merge: true });
+  btn.disabled = false;
+  btn.textContent = 'Save changes';
+  showSavedToast();
+});
+
+function showSavedToast(){
+  const t = document.createElement('div');
+  t.className = 'toast show';
+  t.textContent = 'Settings saved';
+  t.style.position = 'fixed'; t.style.bottom = '26px'; t.style.left = '50%'; t.style.transform = 'translateX(-50%)';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+
+requireAdmin().then(() => {
+  renderAdminShell('settings');
+  loadSettings();
+});
+</script>
+</body>
+</html>
